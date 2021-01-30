@@ -49,7 +49,7 @@ def getPost(sub, type):
             t = i[1].title
             title = (t[:75] + '...') if len(t) > 75 else t
             output = f'{output}{i[0]}. {title}\n'
-        output = f'{output}\nType the umber corresponfing to a post'
+        output = f'{output}\nType the number corresponfing to a post'
     except Exception as e:
         output = f'ERROR: {e}'
     finally:
