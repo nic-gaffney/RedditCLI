@@ -5,11 +5,11 @@ from colorama import Fore
 
 # The intro at the start
 def intro():
-    return(Fore.RED + '''
-Welcome to RedditCLI, a command line interface for a read-only reddit instance!
-To use RedditCLI, start by typing help in the interface!
-Made by u/Gaffclant
-    ''')
+    return(Fore.RED + '\n\nWelcome to RedditCLI, a command line interface for a'
+           'read-only reddit instance!'
+           '\nTo use RedditCLI, start by typing' + Fore.RESET + ' help '
+           + Fore.RED + 'in the interface!'
+           '\nMade by u/Gaffclant\n' + Fore.RESET)
 
 
 # The help command
