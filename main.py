@@ -56,6 +56,7 @@ def getPost(sub, type):
         return output, selector
 
 
+# Show content in subreddit
 def showContent(subm):
     output = ''
     author = subm.author
