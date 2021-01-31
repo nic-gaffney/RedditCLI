@@ -66,11 +66,16 @@ def getType(subreddit, type):
 
 
 # Activate subreddit
-def getPost(sub, type):
+def getPost(args):
+    if (len(args) < 2):
+        return 'Get command requires atleast 2 arguments!'
+    sub = args[0]
+    type = args[1]
+
     global inSub
     global reddit
     output = ''
-    selector = []
+    submissions = []
 
     try:
         type = type.lower()
@@ -92,7 +97,28 @@ def getPost(sub, type):
     except Exception as e:
         output = f'ERROR: {e}'
     finally:
-        return output, selector
+        # This will be run after the command is completed
+        def continuationFunction():
+            # Getting the post the user would like to view
+            postStr = input(Fore.GREEN + f'GET {inSub}> ' + Fore.RESET)
+
+            try:
+                # Converting it into a number
+                postNum = int(postStr)
+
+                # Making sure post number inputted is within
+                # range of the submissions list
+                if 0 < postNum < len(submissions):
+                    print(showContent(submissions[postNum][1]))
+
+                # Recurssivly calling continuation function
+                # just incase user wants to view more posts
+                continuationFunction()
+            except ValueError:
+                # Returning back to previous state if
+                # no number is passed
+                return
+        return (output, continuationFunction)
 
 
 # Show content in subreddit
@@ -116,7 +142,6 @@ def main():
     global inSub
     global reddit
     args = []
-    selector = []
     inSub = None
 
     agent = 'PC, MAc, Linux. Reddit from the command line by u/Gaffclant v1.0'
@@ -128,50 +153,40 @@ def main():
 # Start Program
     print(intro())
     while True:
-        result = ''
 
         # Displays command line as 'SUBREDDIT> '
         cmd = input(Fore.GREEN + f'{inSub}> ' + Fore.RESET)
 
-        # Handle clear and exit commands
-        if cmd == 'exit':
-            os.system('clear')
-            quit()
-        elif cmd == 'clear':
-            os.system('clear')
+        commands = {
+            'quit': lambda args: quit(),
+            'clear': lambda args: os.system('clear'),
+            'help': rhelp,
+            'get': getPost
+        }
 
-        # Split input into readable values
-        args = [_ for _ in cmd.split(' ')]
-        try:
-            arg1 = args[1]
-            arg2 = args[2]
-        except IndexError:
-            arg1 = None
-            arg2 = None
+        # Get command & its arguments
+        command = cmd.split(' ')[0].lower()
+        args = cmd.split(' ')[1:]
 
-        # The commands
-        com = {
-               'help': rhelp(),
-               'intro': intro(),
-               'get': getPost(arg1, arg2),
-               }
+        # Execute function corosponding to the command
+        if command in commands:
+            func = commands[command]
+            res = func(args)
 
-        # Determines how to read the command
-        try:
-            result, selector = com[args[0]]
-        except ValueError:
-            result = com[args[0]]
-        except KeyError:
-            try:
-                result = showContent(selector[int(args[0])][1])
-            except Exception:
-                if cmd == 'clear':
-                    continue
-                else:
-                    print(Fore.RED + f"ERROR: Unkown command.\n{rhelp()}"
-                          + Fore.RESET)
-        finally:
-            print(result)
+            # Turning the response into a tuple if it isnt already one
+            if not type(res) == tuple:
+                # Response tuples should always be formatted as
+                # (output, continuation function), anything else
+                # will be ignored. The continuation function
+                # allows for commands to have continued presence
+                res = tuple([res])
+
+            # Printing the output (first element in the tuple)
+            print(res[0])
+
+            # Running the continuation function
+            if len(res) > 1:
+                res[1]()
 
 
 if __name__ == '__main__':
