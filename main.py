@@ -198,7 +198,7 @@ def main():
     args = []
     inSub = None
 
-    agent = ('PC, MAc, Linux. Reddit from the '
+    agent = ('Linux. Reddit from the '
              + 'command line by u/Gaffclant v1.3')
     reddit = praw.Reddit(client_id="BGLk80bE3REJAw",
                          client_secret=None,
