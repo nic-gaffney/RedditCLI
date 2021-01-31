@@ -72,6 +72,7 @@ def getPost(args):
         return 'Get command requires at least 2 arguments!'
     sub = args[0]
     type = args[1]
+    print(type)
 
     global inSub
     global reddit
@@ -83,10 +84,10 @@ def getPost(args):
         sub = sub.lower()
         subreddit = reddit.subreddit(sub)
         inSub = subreddit.display_name
-        submission = getType(subreddit, type)
+        submissions = getType(subreddit, type)
 
         # Turn selector into printable data
-        for i in submission:
+        for i in submissions:
             t = i[1].title
             title = (t[:65] + '...') if len(t) > 75 else t
 
@@ -94,7 +95,8 @@ def getPost(args):
             output = (f'{output}' + Fore.LIGHTBLUE_EX + f'{i[0]}. '
                       + Fore.LIGHTRED_EX + f'{title}\n')
 
-        output = f'{output}\nType the number corresponfing to a post'
+        output = (f'{output}\nType the number corresponfing to a post,'
+                  + ' or type anythng but a number to exit GET mode')
     except Exception as e:
         output = f'ERROR: {e}'
     finally:
@@ -110,13 +112,13 @@ def getPost(args):
                 # Making sure post number inputted is within
                 # range of the submissions list
                 if 0 <= postNum < len(submissions):
-                    print(showContent(submissions[postNum][1]))
+                    output = showContent(submissions[postNum][1])
+                    print(output)
 
                 # Recurssivly calling continuation function
                 # just incase user wants to view more posts
                 continuationFunction()
-            except ValueError as e:
-                print(e)
+            except ValueError:
                 # Returning back to previous state if
                 # no number is passed
                 return
@@ -157,7 +159,7 @@ def main():
     while True:
 
         # Displays command line as 'GET SUBREDDIT> '
-        cmd = input(Fore.GREEN + f'{inSub}> ' + Fore.RESET)
+        cmd = input(Fore.GREEN + 'Command> ' + Fore.RESET)
 
         commands = {
             'quit': lambda args: quit(),
