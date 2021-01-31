@@ -6,31 +6,47 @@ from colorama import Fore
 
 # The intro at the start
 def intro(args):
-    return(Fore.YELLOW + '\nWelcome to RedditCLI, '
+    return(Fore.YELLOW
+           + '\nWelcome to RedditCLI, '
            + 'a command line interface for a'
-           'read-only reddit instance!'
-           '\nTo use RedditCLI, start by typing' + Fore.RESET + ' help '
-           + Fore.YELLOW + 'in the interface!'
-           '\nMade by u/Gaffclant\n' + Fore.RESET)
+           + 'read-only reddit instance!'
+           + '\nTo use RedditCLI, start by typing'
+           + Fore.RESET
+           + ' help '
+           + Fore.YELLOW
+           + 'in the interface!'
+           + '\nMade by u/Gaffclant\n'
+           + Fore.RESET)
 
 
 # The help command
 def rhelp(args):
-    return(Fore.LIGHTRED_EX + '\nCommands for RedditCLI'
-           + Fore.CYAN + '\n\thelp:'
-           + Fore.MAGENTA + ' Displayes this page'
+    return(Fore.LIGHTRED_EX
+           + '\nCommands for RedditCLI'
            + Fore.CYAN
-           + '\n\tintro:' + Fore.MAGENTA + ' Displays the intro page again'
+           + '\n\thelp:'
+           + Fore.MAGENTA
+           + ' Displayes this page'
            + Fore.CYAN
-           + '\n\tget<subreddit><type>:' + Fore.MAGENTA + ' Gets posts'
+           + '\n\tintro:'
+           + Fore.MAGENTA
+           + ' Displays the intro page again'
+           + Fore.CYAN
+           + '\n\tget<subreddit><type>:'
+           + Fore.MAGENTA + ' Gets posts'
            + ' from specified subreddit'
-           + Fore.MAGENTA + '\n\t\tTYPES: ' + Fore.CYAN + 'new, top, hot,'
+           + Fore.MAGENTA + '\n\t\tTYPES: '
+           + Fore.CYAN + 'new, top, hot,'
            + ' rising, gilded, controversial'
-           + Fore.GREEN + '\n\t\tNone>' + Fore.RESET + ' get learnpython new'
+           + Fore.GREEN
+           + '\n\t\tCommand>' + Fore.RESET
+           + ' get learnpython new'
            + Fore.MAGENTA
            + '\n\t\tgives you the newest posts from r/learnpython'
-           + Fore.CYAN + '\n\texit:'
-           + Fore.MAGENTA + ' Quits the program\n'
+           + Fore.CYAN
+           + '\n\tquit:'
+           + Fore.MAGENTA
+           + ' Quits the program\n'
            + Fore.RESET)
 
 
@@ -89,14 +105,19 @@ def getPost(args):
         # Turn selector into printable data
         for i in submissions:
             t = i[1].title
+            auth = i[1].author
             title = (t[:65] + '...') if len(t) > 75 else t
 
             # Initialize the output
             output = (f'{output}' + Fore.LIGHTBLUE_EX + f'{i[0]}. '
-                      + Fore.LIGHTRED_EX + f'{title}\n')
+                      + Fore.LIGHTMAGENTA_EX + f'{title}'
+                      + Fore.YELLOW + f'-{auth}\n'
+                      )
 
-        output = (f'{output}\nType the number corresponfing to a post,'
-                  + ' or type anythng but a number to exit GET mode')
+        output = (f'{output}\n' + Fore.CYAN
+                  + 'Type the number corresponfing to a post,'
+                  + ' or type anythng but a number to exit GET mode'
+                  + Fore.RESET)
     except Exception as e:
         output = f'ERROR: {e}'
     finally:
@@ -135,8 +156,18 @@ def showContent(subm):
         use = subm.url
 
     author = subm.author
-    output = (f'Author: {author.name}\tKarma: {author.link_karma}\n')
-    output = (f'{output}{subm.score}\t{subm.title}\n\n{use}')
+    output = (Fore.LIGHTBLUE_EX
+              + 'Author: '
+              + Fore.YELLOW
+              + f'{author.name}'
+              + Fore.LIGHTBLUE_EX
+              + '\tKarma: '
+              + Fore.YELLOW
+              + f'{author.link_karma}\n'
+              + Fore.LIGHTCYAN_EX
+              + f'{subm.score}'
+              + Fore.LIGHTMAGENTA_EX
+              + f'\t{subm.title}' + Fore.RESET + f'\n\n{use}')
     return output
 
 
@@ -149,7 +180,7 @@ def main():
     inSub = None
 
     agent = ('PC, MAc, Linux. Reddit from the '
-             + 'command line by u/Gaffclant v1.0.9')
+             + 'command line by u/Gaffclant v1.2')
     reddit = praw.Reddit(client_id="BGLk80bE3REJAw",
                          client_secret=None,
                          user_agent=agent
