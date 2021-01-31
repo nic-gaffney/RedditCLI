@@ -1,5 +1,6 @@
 # Imports
 import praw
+import os
 from colorama import Fore
 
 
@@ -15,15 +16,17 @@ def intro():
 # The help command
 def rhelp():
     return(Fore.CYAN + '\nCommands for RedditCLI'
-           + Fore.BLUE + '\n\thelp:' + Fore.MAGENTA + ' Displayes this page'
-           + Fore.BLUE
+           + Fore.LIGHTBLUE_EX + '\n\thelp:'
+           + Fore.MAGENTA + ' Displayes this page'
+           + Fore.LIGHTBLUE_EX
            + '\n\tintro:' + Fore.MAGENTA + ' Displays the intro page again'
-           + Fore.BLUE
+           + Fore.LIGHTBLUE_EX
            + '\n\tget:' + Fore.MAGENTA + ' Gets posts from specified subreddit'
            + Fore.GREEN + '\n\t\tNone>' + Fore.RESET + ' get learnpython new'
            + Fore.MAGENTA
            + '\n\t\tgives you the newst posts from r/learnpython'
-           + Fore.BLUE + '\n\texit:' + Fore.MAGENTA + ' Quits the program\n'
+           + Fore.LIGHTBLUE_EX + '\n\texit:'
+           + Fore.MAGENTA + ' Quits the program\n'
            + Fore.RESET)
 
 
@@ -47,8 +50,12 @@ def getPost(sub, type):
 
         for i in selector:
             t = i[1].title
-            title = (t[:75] + '...') if len(t) > 75 else t
-            output = f'{output}{i[0]}. {title}\n'
+            title = (t[:65] + '...') if len(t) > 75 else t
+
+            # Initialize the output
+            output = (f'{output}' + Fore.LIGHTBLUE_EX + f'{i[0]}. '
+                      + Fore.LIGHTRED_EX + f'{title}\n')
+
         output = f'{output}\nType the number corresponfing to a post'
     except Exception as e:
         output = f'ERROR: {e}'
@@ -59,9 +66,10 @@ def getPost(sub, type):
 # Show content in subreddit
 def showContent(subm):
     output = ''
+    text = subm.selftext
     author = subm.author
     output = (f'Author: {author.name}\tKarma: {author.link_karma}\n')
-    output = (f'{output}{subm.score}\t{subm.title}\n\n{subm.selftext}')
+    output = (f'{output}{subm.score}\t{subm.title}\n\n{text}')
     return output
 
 
@@ -82,9 +90,13 @@ def main():
 # Start Program
     print(intro())
     while True:
+        result = ''
         cmd = input(Fore.GREEN + f'{inSub}> ' + Fore.RESET)
         if cmd == 'exit':
+            os.system('clear')
             quit()
+        elif cmd == 'clear':
+            os.system('clear')
         args = [_ for _ in cmd.split(' ')]
         try:
             arg1 = args[1]
@@ -93,9 +105,10 @@ def main():
             arg1 = None
             arg2 = None
 
-        com = {'help': rhelp(),
+        com = {'placeholder': 'null',
+               'help': rhelp(),
                'intro': intro(),
-               'get': getPost(arg1, arg2)
+               'get': getPost(arg1, arg2),
                }
         try:
             result, selector = com[args[0]]
@@ -104,6 +117,8 @@ def main():
         except KeyError:
             try:
                 result = showContent(selector[int(args[0])][1])
+            except ValueError:
+                continue
             except Exception:
                 print(f"Unkown command.\n{rhelp()}")
         finally:
