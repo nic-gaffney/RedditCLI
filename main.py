@@ -2,6 +2,7 @@
 import praw
 import os
 from colorama import Fore
+# Huge thanks to the contribution made by https://github.com/CatDevz
 
 
 # The intro at the start
