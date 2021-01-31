@@ -6,35 +6,69 @@ from colorama import Fore
 
 # The intro at the start
 def intro():
-    return(Fore.RED + '\nWelcome to RedditCLI, a command line interface for a'
+    return(Fore.YELLOW + '\nWelcome to RedditCLI, a command line interface for a'
            'read-only reddit instance!'
            '\nTo use RedditCLI, start by typing' + Fore.RESET + ' help '
-           + Fore.RED + 'in the interface!'
+           + Fore.YELLOW + 'in the interface!'
            '\nMade by u/Gaffclant\n' + Fore.RESET)
 
 
 # The help command
 def rhelp():
-    return(Fore.CYAN + '\nCommands for RedditCLI'
-           + Fore.LIGHTBLUE_EX + '\n\thelp:'
+    return(Fore.LIGHTRED_EX + '\nCommands for RedditCLI'
+           + Fore.CYAN + '\n\thelp:'
            + Fore.MAGENTA + ' Displayes this page'
-           + Fore.LIGHTBLUE_EX
+           + Fore.CYAN
            + '\n\tintro:' + Fore.MAGENTA + ' Displays the intro page again'
-           + Fore.LIGHTBLUE_EX
-           + '\n\tget:' + Fore.MAGENTA + ' Gets posts from specified subreddit'
+           + Fore.CYAN
+           + '\n\tget<subreddit><type>:' + Fore.MAGENTA + ' Gets posts'
+           + ' from specified subreddit'
+           + Fore.MAGENTA + '\n\t\tTYPES: ' + Fore.CYAN + 'new, top, hot,'
+           + ' rising, gilded, controversial'
            + Fore.GREEN + '\n\t\tNone>' + Fore.RESET + ' get learnpython new'
            + Fore.MAGENTA
-           + '\n\t\tgives you the newst posts from r/learnpython'
-           + Fore.LIGHTBLUE_EX + '\n\texit:'
+           + '\n\t\tgives you the newest posts from r/learnpython'
+           + Fore.CYAN + '\n\texit:'
            + Fore.MAGENTA + ' Quits the program\n'
            + Fore.RESET)
+
+
+def getType(subreddit, type):
+    line = 0
+    selector = []
+
+    if type == 'hot':
+        for submission in subreddit.hot(limit=10):
+            selector.append([line, submission])
+            line += 1
+    elif type == 'new':
+        for submission in subreddit.new(limit=10):
+            selector.append([line, submission])
+            line += 1
+    elif type == 'controversial':
+        for submission in subreddit.controversial(limit=10):
+            selector.append([line, submission])
+            line += 1
+    elif type == 'gilded':
+        for submission in subreddit.gilded(limit=10):
+            selector.append([line, submission])
+            line += 1
+    elif type == 'rising':
+        for submission in subreddit.rising(limit=10):
+            selector.append([line, submission])
+            line += 1
+    elif type == 'top':
+        for submission in subreddit.top(limit=10):
+            selector.append([line, submission])
+            line += 1
+
+    return selector
 
 
 # Activate subreddit
 def getPost(sub, type):
     global inSub
     global reddit
-    line = 0
     output = ''
     selector = []
 
@@ -43,11 +77,9 @@ def getPost(sub, type):
         sub = sub.lower()
         subreddit = reddit.subreddit(sub)
         inSub = subreddit.display_name
-        if type == 'hot':
-            for submission in subreddit.hot(limit=10):
-                selector.append([line, submission])
-                line += 1
+        selector = getType(subreddit, type)
 
+        # Turn selector into printable data
         for i in selector:
             t = i[1].title
             title = (t[:65] + '...') if len(t) > 75 else t
@@ -66,15 +98,21 @@ def getPost(sub, type):
 # Show content in subreddit
 def showContent(subm):
     output = ''
-    text = subm.selftext
+    isText = subm.is_self
+    if isText:
+        use = subm.selftext
+    else:
+        use = subm.url
+
     author = subm.author
     output = (f'Author: {author.name}\tKarma: {author.link_karma}\n')
-    output = (f'{output}{subm.score}\t{subm.title}\n\n{text}')
+    output = (f'{output}{subm.score}\t{subm.title}\n\n{use}')
     return output
 
 
 # Main loop
 def main():
+    os.system('clear')
     global inSub
     global reddit
     args = []
@@ -91,12 +129,18 @@ def main():
     print(intro())
     while True:
         result = ''
+
+        # Displays command line as 'SUBREDDIT> '
         cmd = input(Fore.GREEN + f'{inSub}> ' + Fore.RESET)
+
+        # Handle clear and exit commands
         if cmd == 'exit':
             os.system('clear')
             quit()
         elif cmd == 'clear':
             os.system('clear')
+
+        # Split input into readable values
         args = [_ for _ in cmd.split(' ')]
         try:
             arg1 = args[1]
@@ -105,11 +149,14 @@ def main():
             arg1 = None
             arg2 = None
 
-        com = {'placeholder': 'null',
+        # The commands
+        com = {
                'help': rhelp(),
                'intro': intro(),
                'get': getPost(arg1, arg2),
                }
+
+        # Determines how to read the command
         try:
             result, selector = com[args[0]]
         except ValueError:
@@ -117,10 +164,12 @@ def main():
         except KeyError:
             try:
                 result = showContent(selector[int(args[0])][1])
-            except ValueError:
-                continue
             except Exception:
-                print(f"Unkown command.\n{rhelp()}")
+                if cmd == 'clear':
+                    continue
+                else:
+                    print(Fore.RED + f"ERROR: Unkown command.\n{rhelp()}"
+                          + Fore.RESET)
         finally:
             print(result)
 
