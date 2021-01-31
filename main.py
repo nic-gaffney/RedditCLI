@@ -14,12 +14,14 @@ def intro():
 
 
 # The help command
-def rhelp():
+def rhelp(args):
     return(Fore.CYAN + '\nCommands for RedditCLI'
            + Fore.LIGHTBLUE_EX + '\n\thelp:'
            + Fore.MAGENTA + ' Displayes this page'
-           + Fore.LIGHTBLUE_EX
-           + '\n\tintro:' + Fore.MAGENTA + ' Displays the intro page again'
+           + Fore.LIGHTBLUE_EX + '\n\tquit:'
+           + Fore.MAGENTA + ' Quits the program'
+           + Fore.LIGHTBLUE_EX + '\n\tclear:'
+           + Fore.MAGENTA + ' Clears the terminal screen'
            + Fore.LIGHTBLUE_EX
            + '\n\tget:' + Fore.MAGENTA + ' Gets posts from specified subreddit'
            + Fore.GREEN + '\n\t\tNone>' + Fore.RESET + ' get learnpython new'
@@ -31,12 +33,17 @@ def rhelp():
 
 
 # Activate subreddit
-def getPost(sub, type):
+def getPost(args):
+    if (len(args) < 2):
+        return 'Get command requires atleast 2 arguments!'
+    sub = args[0]
+    type = args[1]
+
     global inSub
     global reddit
     line = 0
     output = ''
-    selector = []
+    submissions = []
 
     try:
         type = type.lower()
@@ -45,10 +52,10 @@ def getPost(sub, type):
         inSub = subreddit.display_name
         if type == 'hot':
             for submission in subreddit.hot(limit=10):
-                selector.append([line, submission])
+                submissions.append([line, submission])
                 line += 1
 
-        for i in selector:
+        for i in submissions:
             t = i[1].title
             title = (t[:65] + '...') if len(t) > 75 else t
 
@@ -60,7 +67,28 @@ def getPost(sub, type):
     except Exception as e:
         output = f'ERROR: {e}'
     finally:
-        return output, selector
+        # This will be run after the command is completed
+        def continuationFunction():
+            # Getting the post the user would like to view
+            postStr = input(Fore.GREEN + f'GET {inSub}> ' + Fore.RESET)
+
+            try:
+                # Converting it into a number
+                postNum = int(postStr)
+
+                # Making sure post number inputted is within
+                # range of the submissions list
+                if 0 < postNum < len(submissions):
+                    print(showContent(submissions[postNum][1]))
+
+                # Recurssivly calling continuation function
+                # just incase user wants to view more posts
+                continuationFunction()
+            except ValueError:
+                # Returning back to previous state if
+                # no number is passed
+                return
+        return (output, continuationFunction)
 
 
 # Show content in subreddit
@@ -92,37 +120,37 @@ def main():
     while True:
         result = ''
         cmd = input(Fore.GREEN + f'{inSub}> ' + Fore.RESET)
-        if cmd == 'exit':
-            os.system('clear')
-            quit()
-        elif cmd == 'clear':
-            os.system('clear')
-        args = [_ for _ in cmd.split(' ')]
-        try:
-            arg1 = args[1]
-            arg2 = args[2]
-        except IndexError:
-            arg1 = None
-            arg2 = None
 
-        com = {'placeholder': 'null',
-               'help': rhelp(),
-               'intro': intro(),
-               'get': getPost(arg1, arg2),
-               }
-        try:
-            result, selector = com[args[0]]
-        except ValueError:
-            result = com[args[0]]
-        except KeyError:
-            try:
-                result = showContent(selector[int(args[0])][1])
-            except ValueError:
-                continue
-            except Exception:
-                print(f"Unkown command.\n{rhelp()}")
-        finally:
-            print(result)
+        commands = {
+            'quit': lambda args: quit(),
+            'clear': lambda args: os.system('clear'),
+            'help': rhelp,
+            'get': getPost
+        }
+
+        # Get command & its arguments
+        command = cmd.split(' ')[0].lower()
+        args = cmd.split(' ')[1:]
+
+        # Execute function corosponding to the command
+        if command in commands:
+            func = commands[command]
+            res = func(args)
+
+            # Turning the response into a tuple if it isnt already one
+            if not type(res) == tuple:
+                # Response tuples should always be formatted as
+                # (output, continuation function), anything else
+                # will be ignored. The continuation function
+                # allows for commands to have continued presence
+                res = tuple([res])
+
+            # Printing the output (first element in the tuple)
+            print(res[0])
+
+            # Running the continuation function
+            if len(res) > 1:
+                res[1]()
 
 
 if __name__ == '__main__':
