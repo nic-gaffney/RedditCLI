@@ -1,6 +1,7 @@
 # Imports
 import praw
 import os
+import requests
 from colorama import Fore
 # Huge thanks to the contribution made by https://github.com/CatDevz
 
@@ -119,6 +120,7 @@ def getPost(args):
                   + 'Type the number corresponfing to a post,'
                   + ' or type anythng but a number to exit GET mode'
                   + Fore.RESET)
+
     except Exception as e:
         output = f'ERROR: {e}'
     finally:
@@ -135,7 +137,19 @@ def getPost(args):
                 # range of the submissions list
                 if 0 <= postNum < len(submissions):
                     output = showContent(submissions[postNum][1])
-                    print(output)
+                    print(output[0])
+
+                    isText = output[1]
+                    use = output[2]
+                    id = output[3]
+                    if not isText:
+                        download = input(Fore.LIGHTRED_EX
+                                         + f'Download {use}? [Y/n]: ')
+                        if download == 'Y':
+                            down = requests.get(use)
+                            open(f'Images/{id}.jpg', 'wb').write(down.content)
+                        else:
+                            print(Fore.CYAN + 'Cancled download' + Fore.RESET)
 
                 # Recurssivly calling continuation function
                 # just incase user wants to view more posts
@@ -149,7 +163,8 @@ def getPost(args):
 
 # Show content in submisision
 def showContent(subm):
-    output = ''
+    output = []
+    id = subm.id
     isText = subm.is_self
     if isText:
         use = subm.selftext
@@ -157,18 +172,21 @@ def showContent(subm):
         use = subm.url
 
     author = subm.author
-    output = (Fore.LIGHTBLUE_EX
-              + 'Author: '
-              + Fore.YELLOW
-              + f'{author.name}'
-              + Fore.LIGHTBLUE_EX
-              + '\tKarma: '
-              + Fore.YELLOW
-              + f'{author.link_karma}\n'
-              + Fore.LIGHTCYAN_EX
-              + f'{subm.score}'
-              + Fore.LIGHTMAGENTA_EX
-              + f'\t{subm.title}' + Fore.RESET + f'\n\n{use}')
+    text = (Fore.LIGHTBLUE_EX
+            + 'Author: '
+            + Fore.YELLOW
+            + f'{author.name}'
+            + Fore.LIGHTBLUE_EX
+            + '\tKarma: '
+            + Fore.YELLOW
+            + f'{author.link_karma}\n'
+            + Fore.LIGHTCYAN_EX
+            + f'{subm.score}'
+            + Fore.LIGHTMAGENTA_EX
+            + f'\t{subm.title}' + Fore.RESET + f'\n\n{use}')
+
+    output = [text, isText, use, id]
+
     return output
 
 
