@@ -52,6 +52,16 @@ def rhelp(args):
            + Fore.RESET)
 
 
+def downloader(url, id):
+    download = input(Fore.LIGHTRED_EX
+                     + f'Download {url}? [Y/n]: ')
+    if download == 'Y':
+        down = requests.get(url)
+        open(f'Images/{id}.jpg', 'wb').write(down.content)
+    else:
+        print(Fore.CYAN + 'Cancled download' + Fore.RESET)
+
+
 def getType(subreddit, type):
     line = 0
     selector = []
@@ -90,7 +100,6 @@ def getPost(args):
         return 'Get command requires at least 2 arguments!'
     sub = args[0]
     type = args[1]
-    print(type)
 
     global inSub
     global reddit
@@ -143,13 +152,7 @@ def getPost(args):
                     use = output[2]
                     id = output[3]
                     if not isText:
-                        download = input(Fore.LIGHTRED_EX
-                                         + f'Download {use}? [Y/n]: ')
-                        if download == 'Y':
-                            down = requests.get(use)
-                            open(f'Images/{id}.jpg', 'wb').write(down.content)
-                        else:
-                            print(Fore.CYAN + 'Cancled download' + Fore.RESET)
+                        downloader(use, id)
 
                 # Recurssivly calling continuation function
                 # just incase user wants to view more posts
