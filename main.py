@@ -94,6 +94,15 @@ def getType(subreddit, type):
     return selector
 
 
+def commentParser(com):
+    for comment in com:
+        output = (Fore.RED + '#'*20 + Fore.MAGENTA
+                  + '\nReply to: ' + Fore.YELLOW + f'{comment.parent().author}'
+                  + f'\n{comment.author}> '
+                  + Fore.RESET + f'{comment.body}')
+        print(output)
+
+
 # Activate subreddit
 def getPost(args):
     if (len(args) < 2):
@@ -126,8 +135,8 @@ def getPost(args):
                       )
 
         output = (f'{output}\n' + Fore.CYAN
-                  + 'Type the number corresponfing to a post,'
-                  + ' or type anythng but a number to exit GET mode'
+                  + 'Type <num to post> <number of comments to show>'
+                  + ' or type quit to exit GET mode.'
                   + Fore.RESET)
 
     except Exception as e:
@@ -136,23 +145,35 @@ def getPost(args):
         # This will be run after the command is completed
         def continuationFunction():
             # Getting the post the user would like to view
-            postStr = input(Fore.GREEN + f'GET {inSub}> ' + Fore.RESET)
+            comArg = input(Fore.GREEN + f'GET {inSub}> ' + Fore.RESET)
+            args = comArg.split(' ')
+            if len(args) < 2 and args[0] != 'quit':
+                print('This takes 2 arguments!')
+                continuationFunction()
+            elif args[0] == 'quit':
+                return
+            postStr = args[0]
+            comStr = args[1]
 
             try:
                 # Converting it into a number
                 postNum = int(postStr)
+                comNum = int(comStr)
 
                 # Making sure post number inputted is within
                 # range of the submissions list
                 if 0 <= postNum < len(submissions):
-                    output = showContent(submissions[postNum][1])
+                    output = showContent(submissions[postNum][1], comNum)
                     print(output[0])
 
                     isText = output[1]
                     use = output[2]
                     id = output[3]
+                    comments = output[4]
                     if not isText:
                         downloader(use, id)
+
+                    commentParser(comments)
 
                 # Recurssivly calling continuation function
                 # just incase user wants to view more posts
@@ -165,16 +186,20 @@ def getPost(args):
 
 
 # Show content in submisision
-def showContent(subm):
+def showContent(subm, com):
+    subm.comments.replace_more(limit=com)
+    comments = subm.comments.list()
+
     output = []
     id = subm.id
+    author = subm.author
     isText = subm.is_self
+
     if isText:
         use = subm.selftext
     else:
         use = subm.url
 
-    author = subm.author
     text = (Fore.LIGHTBLUE_EX
             + 'Author: '
             + Fore.YELLOW
@@ -186,9 +211,9 @@ def showContent(subm):
             + Fore.LIGHTCYAN_EX
             + f'{subm.score}'
             + Fore.LIGHTMAGENTA_EX
-            + f'\t{subm.title}' + Fore.RESET + f'\n\n{use}')
+            + f'\t{subm.title}' + Fore.RESET + f'\n\n{use}\n')
 
-    output = [text, isText, use, id]
+    output = [text, isText, use, id, comments]
 
     return output
 
