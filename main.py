@@ -94,10 +94,18 @@ def getType(subreddit, type):
     return selector
 
 
+# Get the informarion of the comments from the submission
 def commentParser(com):
     for comment in com:
+        try:
+            sample = comment.parent().body[:30] + '...'
+        except AttributeError:
+            sample = comment.parent().selftext[:30] + '...'
         output = (Fore.RED + '#'*20 + Fore.MAGENTA
-                  + '\nReply to: ' + Fore.YELLOW + f'{comment.parent().author}'
+                  + '\nReply to: ' + Fore.YELLOW
+                  + f'{comment.parent().author}> ' + Fore.CYAN
+                  + (sample)
+                  + Fore.YELLOW
                   + f'\n{comment.author}> '
                   + Fore.RESET + f'{comment.body}')
         print(output)
@@ -147,13 +155,15 @@ def getPost(args):
             # Getting the post the user would like to view
             comArg = input(Fore.GREEN + f'GET {inSub}> ' + Fore.RESET)
             args = comArg.split(' ')
-            if len(args) < 2 and args[0] != 'quit':
+            if len(args) < 2 and args[0]:
                 print('This takes 2 arguments!')
-                continuationFunction()
-            elif args[0] == 'quit':
                 return
-            postStr = args[0]
-            comStr = args[1]
+            try:
+                postStr = args[0]
+                comStr = args[1]
+            except IndexError:
+                print('This takes 2 arguments!')
+                return
 
             try:
                 # Converting it into a number
@@ -226,8 +236,8 @@ def main():
     args = []
     inSub = None
 
-    agent = ('Linux. Reddit from the '
-             + 'command line by u/Gaffclant v1.3')
+    agent = ('Any OS with python 3.9.1 Reddit from the '
+             + 'command line RedditCLI by u/Gaffclant v1.3')
     reddit = praw.Reddit(client_id="BGLk80bE3REJAw",
                          client_secret=None,
                          user_agent=agent
