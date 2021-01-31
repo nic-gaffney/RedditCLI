@@ -5,8 +5,9 @@ from colorama import Fore
 
 
 # The intro at the start
-def intro():
-    return(Fore.YELLOW + '\nWelcome to RedditCLI, a command line interface for a'
+def intro(args):
+    return(Fore.YELLOW + '\nWelcome to RedditCLI, '
+           + 'a command line interface for a'
            'read-only reddit instance!'
            '\nTo use RedditCLI, start by typing' + Fore.RESET + ' help '
            + Fore.YELLOW + 'in the interface!'
@@ -14,7 +15,7 @@ def intro():
 
 
 # The help command
-def rhelp():
+def rhelp(args):
     return(Fore.LIGHTRED_EX + '\nCommands for RedditCLI'
            + Fore.CYAN + '\n\thelp:'
            + Fore.MAGENTA + ' Displayes this page'
@@ -68,7 +69,7 @@ def getType(subreddit, type):
 # Activate subreddit
 def getPost(args):
     if (len(args) < 2):
-        return 'Get command requires atleast 2 arguments!'
+        return 'Get command requires at least 2 arguments!'
     sub = args[0]
     type = args[1]
 
@@ -82,10 +83,10 @@ def getPost(args):
         sub = sub.lower()
         subreddit = reddit.subreddit(sub)
         inSub = subreddit.display_name
-        selector = getType(subreddit, type)
+        submission = getType(subreddit, type)
 
         # Turn selector into printable data
-        for i in selector:
+        for i in submission:
             t = i[1].title
             title = (t[:65] + '...') if len(t) > 75 else t
 
@@ -108,20 +109,21 @@ def getPost(args):
 
                 # Making sure post number inputted is within
                 # range of the submissions list
-                if 0 < postNum < len(submissions):
+                if 0 <= postNum < len(submissions):
                     print(showContent(submissions[postNum][1]))
 
                 # Recurssivly calling continuation function
                 # just incase user wants to view more posts
                 continuationFunction()
-            except ValueError:
+            except ValueError as e:
+                print(e)
                 # Returning back to previous state if
                 # no number is passed
                 return
         return (output, continuationFunction)
 
 
-# Show content in subreddit
+# Show content in submisision
 def showContent(subm):
     output = ''
     isText = subm.is_self
@@ -151,16 +153,17 @@ def main():
                          )
 
 # Start Program
-    print(intro())
+    print(intro(None))
     while True:
 
-        # Displays command line as 'SUBREDDIT> '
+        # Displays command line as 'GET SUBREDDIT> '
         cmd = input(Fore.GREEN + f'{inSub}> ' + Fore.RESET)
 
         commands = {
             'quit': lambda args: quit(),
             'clear': lambda args: os.system('clear'),
             'help': rhelp,
+            'intro': intro,
             'get': getPost
         }
 
