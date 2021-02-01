@@ -48,7 +48,11 @@ def rhelp(args):
            + Fore.CYAN
            + '\n\tquit:'
            + Fore.MAGENTA
-           + ' Quits the program\n'
+           + ' Quits the program'
+           + Fore.CYAN
+           + '\n\tclear:'
+           + Fore.MAGENTA
+           + ' Clears the terminal\n'
            + Fore.RESET)
 
 
@@ -198,7 +202,7 @@ def getPost(args):
 # Show content in submisision
 def showContent(subm, com):
     subm.comments.replace_more(limit=com)
-    comments = subm.comments.list()
+    comments = subm.comments.list()[:com]
 
     output = []
     id = subm.id
