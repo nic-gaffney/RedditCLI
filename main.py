@@ -1,6 +1,7 @@
 # Imports
 import praw
 import os
+from imgrender import render
 import requests
 from colorama import Fore
 # Huge thanks to the contribution made by https://github.com/CatDevz
@@ -57,6 +58,7 @@ def rhelp(args):
 
 
 def downloader(url, id):
+    render(url, scale=(50, 50))
     download = input(Fore.LIGHTRED_EX
                      + f'Download {url}? [Y/n]: ')
     if download == 'Y':
