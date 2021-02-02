@@ -9,4 +9,4 @@ Dependencies can be installed via `pip3 install requirements.txt`, or you can in
 ## Installation
 As of right now, there is no *installation* per say, but the script can be run from `python3 main.py`.
 ## Contributions
-Thanks to [Cody](https://github.com/CatDevs) for the contribution to RedditCLI and the issues addressed.
+Thanks to [Cody](https://github.com/CatDevz) for the contribution to RedditCLI and the issues addressed.
