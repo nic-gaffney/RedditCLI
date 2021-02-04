@@ -6,8 +6,17 @@ import requests
 from colorama import Fore
 # Huge thanks to the contribution made by https://github.com/CatDevz
 
+# DECORATORS
 
-# The intro at the start
+
+def funcPrint(f):
+    def printable(args):
+        print(f(args))
+        # The intro at the start
+    return printable
+
+
+@funcPrint
 def intro(args):
     return(Fore.YELLOW
            + '\nWelcome to RedditCLI, '
@@ -23,6 +32,7 @@ def intro(args):
 
 
 # The help command
+@funcPrint
 def rhelp(args):
     return(Fore.LIGHTRED_EX
            + '\nCommands for RedditCLI'
@@ -159,21 +169,25 @@ def getPost(args):
     except Exception as e:
         output = f'ERROR: {e}'
     finally:
+        out = '\n' + Fore.RED + '#'*40 + '\n' + output + Fore.RESET
         # This will be run after the command is completed
+
         def continuationFunction():
             # Getting the post the user would like to view
+            print(out)
             comArg = input(Fore.GREEN + f'GET {inSub}> ' + Fore.RESET)
             args = comArg.split(' ')
-            if len(args) < 2 and args[0]:
-                print('This takes 2 arguments!')
+            if args[0].lower() == ('quit' or 'exit'):
                 return
+            if len(args) < 2:
+                print('This takes 2 arguments!')
+                continuationFunction()
             try:
                 postStr = args[0]
                 comStr = args[1]
             except IndexError:
                 print('This takes 2 arguments!')
-                return
-
+                continuationFunction()
             try:
                 # Converting it into a number
                 postNum = int(postStr)
@@ -253,7 +267,7 @@ def main():
                          )
 
 # Start Program
-    print(intro(None))
+    intro(None)
     while True:
 
         # Displays command line as 'GET SUBREDDIT> '
@@ -285,7 +299,7 @@ def main():
                 res = tuple([res])
 
             # Printing the output (first element in the tuple)
-            print(res[0])
+            res[0]
 
             # Running the continuation function
             if len(res) > 1:
