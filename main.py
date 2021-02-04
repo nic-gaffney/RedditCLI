@@ -58,7 +58,10 @@ def rhelp(args):
 
 
 def downloader(url, id):
-    render(url, scale=(50, 50))
+    try:
+        render(url, scale=(50, 50))
+    except FileNotFoundError:
+        pass
     download = input(Fore.LIGHTRED_EX
                      + f'Download {url}? [Y/n]: ')
     if download == 'Y':
