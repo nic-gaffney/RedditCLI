@@ -6,9 +6,8 @@ import requests
 from colorama import Fore
 # Huge thanks to the contribution made by https://github.com/CatDevz
 
+
 # DECORATORS
-
-
 def funcPrint(f):
     def printable(args):
         print(f(args))
