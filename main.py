@@ -67,6 +67,8 @@ def rhelp(args):
 
 
 def downloader(url, id):
+    if not os.path.exists('Images'):
+        os.makedirs('Images')
     try:
         render(url, scale=(50, 50))
     except FileNotFoundError:
@@ -75,7 +77,8 @@ def downloader(url, id):
                      + f'Download {url}? [Y/n]: ')
     if download == 'Y':
         down = requests.get(url)
-        open(f'Images/{id}.jpg', 'wb').write(down.content)
+        img = os.path.join('Images', id)
+        open(f'{img}.jpg', 'wb').write(down.content)
     else:
         print(Fore.CYAN + 'Cancled download' + Fore.RESET)
 
@@ -258,7 +261,7 @@ def main():
     args = []
     inSub = None
 
-    agent = ('Any OS with python 3.9.1 Reddit from the '
+    agent = ('Windows, MacOS, Linux Reddit from the '
              + 'command line RedditCLI by u/Gaffclant v1.3')
     reddit = praw.Reddit(client_id="BGLk80bE3REJAw",
                          client_secret=None,
