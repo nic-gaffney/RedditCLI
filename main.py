@@ -2,7 +2,6 @@
 import praw
 import pathlib
 import os
-from imgrender import render
 import requests
 from colorama import Fore
 # Huge thanks to the contribution made by https://github.com/CatDevz
@@ -70,10 +69,6 @@ def rhelp(args):
 def downloader(url, id):
     if not os.path.exists('Images'):
         os.makedirs('Images')
-    try:
-        render(url, scale=(50, 50))
-    except FileNotFoundError:
-        pass
     download = input(Fore.LIGHTRED_EX
                      + f'Download {url}? [Y/n]: ')
     if download == 'Y':
@@ -190,17 +185,29 @@ def getPost(args):
             elif len(args) < 2:
                 if str(com) == ('exit'):
                     return
+                elif str(com) == ('clear'):
+                    os.system('clear')
                 print('This takes 2 arguments!code2')
                 continuationFunction()
             try:
+                if str(com) == ('exit'):
+                    return
+                elif str(com) == ('clear'):
+                    os.system('clear')
                 postStr = args[0]
                 comStr = args[1]
             except IndexError:
                 if str(com) == ('exit'):
                     return
+                elif str(com) == ('clear'):
+                    os.system('clear')
                 print('This takes 2 arguments!code1')
                 continuationFunction()
             try:
+                if str(com) == ('exit'):
+                    return
+                elif str(com) == ('clear'):
+                    os.system('clear')
                 if str(com) == ('exit'):
                     return
                 # Converting it into a number
@@ -226,6 +233,10 @@ def getPost(args):
                 # just incase user wants to view more posts
                 continuationFunction()
             except ValueError:
+                if str(com) == ('exit'):
+                    return
+                elif str(com) == ('clear'):
+                    os.system('clear')
                 # Returning back to previous state if
                 # no number is passed
                 return
