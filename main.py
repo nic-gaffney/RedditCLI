@@ -187,7 +187,7 @@ def getPost(args):
                     return
                 elif str(com) == ('clear'):
                     os.system('clear')
-                print('This takes 2 arguments!code2')
+                print('This takes 2 arguments!')
                 continuationFunction()
             try:
                 if str(com) == ('exit'):
@@ -201,7 +201,7 @@ def getPost(args):
                     return
                 elif str(com) == ('clear'):
                     os.system('clear')
-                print('This takes 2 arguments!code1')
+                print('This takes 2 arguments!')
                 continuationFunction()
             try:
                 if str(com) == ('exit'):
