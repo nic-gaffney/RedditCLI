@@ -1,3 +1,7 @@
+#####################
+#     Gaffclant     #
+#####################
+
 # Imports
 import praw
 import pathlib
@@ -19,7 +23,7 @@ def funcPrint(f):
 def intro(args):
     return(Fore.YELLOW
            + '\nWelcome to RedditCLI, '
-           + 'a command line interface for a'
+           + 'a command line interface for a '
            + 'read-only reddit instance!'
            + '\nTo use RedditCLI, start by typing'
            + Fore.RESET
